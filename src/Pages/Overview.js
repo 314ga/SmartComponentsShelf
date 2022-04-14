@@ -49,8 +49,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 const Overview = () => {
   const classes = useStyles();
-  const picRef = useRef();
-  const editRef = useRef();
+
   const [containerName, setContainerName] = useState("");
   const [componentsName, setComponentsName] = useState("");
   const [componentsDescription, setComponentsDescription] = useState("");

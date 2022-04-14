@@ -15,13 +15,11 @@ const notifications = [
     label: "Second notification",
   },
 ];
-
+const newNotifications = `You have ${notifications.length} new notifications!`;
+const noNotifications = "No new notifications";
 const NotificationBell = ({ iconColor }) => {
   const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-
-  const newNotifications = `You have ${notifications.length} new notifications!`;
-  const noNotifications = "No new notifications";
 
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
