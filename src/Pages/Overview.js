@@ -20,6 +20,7 @@ import {
   TextField,
   Box,
 } from "../mImportHelper/MUIImports";
+import { Divider } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
   test: {
@@ -51,7 +52,7 @@ const Overview = () => {
   const picRef = useRef();
   const editRef = useRef();
   const [containerName, setContainerName] = useState("");
-  const [componentsName, setCmponentsName] = useState("");
+  const [componentsName, setComponentsName] = useState("");
   const [componentsDescription, setComponentsDescription] = useState("");
   const [singleComponentWeight, setSingleComponentWeight] = useState("");
   const [remainingQuantity, setRemainingQuantity] = useState("");
@@ -82,6 +83,7 @@ const Overview = () => {
     //fetchContainers();
   }, []);
 
+  //handle container update after changes are confirmed
   function handleContainerUpdate() {
     setSuccess(false);
     setContainerLoading(true);
@@ -101,10 +103,65 @@ const Overview = () => {
       });
   }
 
-  // somewhere above
+  // what happens when "Edit settings" button is pressed
   const handleEditBtnClick = (e) => {
+    getSelectedContainer(e.currentTarget.id);
     setOpenEditPopup(true);
-    setClickedContainer(e.target.id);
+    setClickedContainer(e.currentTarget.id);
+  };
+  const handleDetailsBtnClick = (e) => {
+    getSelectedContainer(e.currentTarget.id);
+    setOpenPicPopup(true);
+    setClickedContainer(e.currentTarget.id);
+  };
+
+  const onTextFieldChange = (e) => {
+    switch (e.currentTarget.id) {
+      case "containerName": {
+        setContainerName(e.target.value);
+        break;
+      }
+      case "componentsName": {
+        setComponentsName(e.target.value);
+        break;
+      }
+      case "componentsDescription": {
+        setComponentsDescription(e.target.value);
+        break;
+      }
+      case "totalWeight": {
+        var m = e.target.value.match(/^\d{0,5}(\.\d{0,3}){0,1}$/);
+        if (m) setTotalWeight(e.target.value);
+        break;
+      }
+      case "singleComponentWeight": {
+        var m = e.target.value.match(/^\d{0,5}(\.\d{0,3}){0,1}$/);
+        if (m) setSingleComponentWeight(e.target.value);
+
+        break;
+      }
+      case "remainingQuantity": {
+        var m = e.target.value.match(/^\d{0,10}$/);
+        if (m) setRemainingQuantity(e.target.value);
+
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  };
+  //get selected container properties and set them to states
+  const getSelectedContainer = (ID) => {
+    const container = containersData.filter((container) => {
+      return container.containerName.localeCompare(ID);
+    });
+    setContainerName(container[0].containerName);
+    setComponentsName(container[0].componentsName);
+    setComponentsDescription(container[0].componentsDescription);
+    setSingleComponentWeight(container[0].singleComponentWeight);
+    setRemainingQuantity(container[0].remainingQuantity);
+    setTotalWeight(container[0].totalWeight);
   };
   return (
     <>
@@ -138,16 +195,15 @@ const Overview = () => {
                     </CardActionArea>
                     <CardActions>
                       <Button
-                        ref={picRef}
+                        id={container.containerName}
                         variant="contained"
                         color="secondary"
-                        onClick={() => setOpenPicPopup(true)}
+                        onClick={handleDetailsBtnClick}
                       >
                         Details
                       </Button>
                       <Button
                         id={container.containerName}
-                        ref={editRef}
                         variant="contained"
                         color="primary"
                         onClick={handleEditBtnClick}
@@ -165,31 +221,38 @@ const Overview = () => {
       <DialogComponent
         openPopup={openPicPopup}
         setOpenPopup={setOpenPicPopup}
-        title="Container overview"
+        title={clickedContainer + " overview"}
+        key="details-container"
       >
-        <Grid direction="column" container spacing={3}>
-          <Grid
-            style={{ display: "flex", justifyContent: "center" }}
-            item
-            xs={12}
-          >
-            <p>change to proper element</p>
-          </Grid>
-          <Grid
-            style={{ display: "flex", justifyContent: "center" }}
-            item
-            xs={12}
-          >
-            <p>change to proper element</p>
-          </Grid>
-          <Grid
-            style={{ display: "flex", justifyContent: "center" }}
-            item
-            xs={12}
-          >
-            <p>change to proper element</p>
-          </Grid>
-        </Grid>
+        <p>
+          <b>Container name: </b>
+          {containerName}
+        </p>
+        <Divider />{" "}
+        <p>
+          <b>Components name: </b>
+          {componentsName}
+        </p>
+        <Divider />
+        <p>
+          <b>Components description: </b>
+          {componentsDescription}
+        </p>
+        <Divider />
+        <p>
+          <b>Signle component weight: </b>
+          {singleComponentWeight}
+        </p>
+        <Divider />
+        <p>
+          <b>Remaining quantity: </b>
+          {remainingQuantity}
+        </p>
+        <Divider />
+        <p>
+          <b>Total weight: </b>
+          {totalWeight}
+        </p>
         <DialogActions>
           <Button onClick={() => setOpenPicPopup(false)} color="secondary">
             Close
@@ -202,6 +265,7 @@ const Overview = () => {
         openPopup={openEditPopup}
         setOpenPopup={setOpenEditPopup}
         title={"Edit of " + clickedContainer}
+        key="edit_settings-container"
       >
         {/**onSubmit={handleProfileUpdate}*/}
         <Box
@@ -212,83 +276,68 @@ const Overview = () => {
           noValidate
           autoComplete="off"
         >
-          <TextField
-            error={containerName === ""}
-            helperText={containerName === "" ? "Empty field!" : " "}
-            id="containerName"
-            label="Container Name"
-            required
-            value={containerName}
-            onChange={(event) => setContainerName(event.target.value)}
-          />
-          {/*<TextField
+          <div>
+            <TextField
+              error={containerName === ""}
+              helperText={containerName === "" ? "Empty field!" : " "}
+              id="containerName"
+              label="Container Name"
+              required
+              value={containerName}
+              onChange={onTextFieldChange}
+            />
+            <TextField
+              error={componentsName === ""}
+              helperText={componentsName === "" ? "Empty field!" : " "}
               id="componentsName"
-              inputRef={componentsName}
-              label="Component name"
+              label="Component Name"
               required
-              defaultValue=""
-              error={
-                componentsName.current && componentsName.current.value === ""
-              }
-              helperText={
-                componentsName.current && componentsName.current.value === ""
-                  ? "Empty field!"
-                  : " "
-              }
-            />
-            </div>*/}
-          {/* <div>
-            <TextField
-              inputRef={componentsDescription}
-              id="componentsDescription"
-              label="Component description"
-              required
-              defaultValue=""
-              error={componentsDescription.current.value === ""}
-              helperText={
-                componentsDescription.current.value === ""
-                  ? "Empty field!"
-                  : " "
-              }
-            />
-            <TextField
-              id="singleComponentWeight"
-              inputRef={singleComponentWeight}
-              label="Single component weight"
-              required
-              defaultValue=""
-              error={singleComponentWeight.current.value === ""}
-              helperText={
-                singleComponentWeight.current.value === ""
-                  ? "Empty field!"
-                  : " "
-              }
+              value={componentsName}
+              onChange={onTextFieldChange}
             />
           </div>
           <div>
             <TextField
-              inputRef={remainingQuantity}
-              id="remainingQuantity"
-              label="Remaining quantity"
+              error={componentsDescription === ""}
+              helperText={componentsDescription === "" ? "Empty field!" : " "}
+              id="componentsDescription"
+              multiline
+              minRows={5}
+              label="Component Description"
               required
-              defaultValue=""
-              error={remainingQuantity.current.value === ""}
-              helperText={
-                remainingQuantity.current.value === "" ? "Empty field!" : " "
-              }
+              value={componentsDescription}
+              onChange={onTextFieldChange}
             />
             <TextField
+              error={singleComponentWeight === ""}
+              helperText={singleComponentWeight === "" ? "Empty field!" : " "}
+              id="singleComponentWeight"
+              label="Single Component Weight"
+              required
+              value={singleComponentWeight}
+              onChange={onTextFieldChange}
+            />
+          </div>
+          <div>
+            <TextField
+              error={remainingQuantity === ""}
+              helperText={remainingQuantity === "" ? "Empty field!" : " "}
+              id="remainingQuantity"
+              label="Ramaining quantity"
+              required
+              value={remainingQuantity}
+              onChange={onTextFieldChange}
+            />
+            <TextField
+              error={totalWeight === ""}
+              helperText={totalWeight === "" ? "Empty field!" : " "}
               id="totalWeight"
-              inputRef={totalWeight}
               label="Total weight"
               required
-              defaultValue=""
-              error={totalWeight.current.value === ""}
-              helperText={
-                totalWeight.current.value === "" ? "Empty field!" : " "
-              }
+              value={totalWeight}
+              onChange={onTextFieldChange}
             />
-          </div>*/}
+          </div>
         </Box>
 
         <DialogActions>
