@@ -5,15 +5,8 @@ const containersSlice = createSlice({
   name: "containers",
   //TODO: remove hardcoded values
   initialState: {
-    /*
-    GUIDE:
-    stateName: ""
-
-    componentsName: "Resistors",
-    componentsDescription: "Resistors for smartie people",
-    singleComponentWeight: 0.24,
-    remainingQuantity: 15,
-    totalWeight: 3.6,*/
+    notificationToken: "",
+    notifications: [],
     containersData: [
       {
         containerName: "Container 1",
@@ -41,6 +34,13 @@ const containersSlice = createSlice({
       const { newStateName } = action.payload;
       state.stateName = newStateName;
     },*/
+    notificationToken: (state, action) => {
+      const { newNotificationToken } = action.payload;
+      state.notificationToken = newNotificationToken;
+    },
+    notificationsData: (state, action) => {
+      state.notifications = action.payload.notifications;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -61,5 +61,5 @@ const containersSlice = createSlice({
       });
   },
 });
-/*export const { reducerName } = containersSlice.actions;*/
+export const { notificationToken, notificationsData } = containersSlice.actions;
 export default containersSlice.reducer;
