@@ -1,12 +1,16 @@
 import React, { useContext, useState, useEffect } from "react";
 import { UserContext } from "../providers/UserProvider";
 import SignInPage from "./SignInPage";
+import PasswordReset from "./PasswordReset";
+import * as ROUTES from '../components/common/RouterContstants/routes';
 
 import NavDrawer from "../components/Navbar/NavDrawer";
 import Grid from "@mui/material/Grid";
 import { Outlet } from "react-router-dom";
 import Header from "../components/common/Header";
 import { useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+
 
 const Firebase = () => {
   const user = useContext(UserContext);
@@ -27,6 +31,13 @@ const Firebase = () => {
   ) : (
     <>
       <SignInPage />
+      {/* <Routes>
+        <Route path="/">
+          <Route path={ROUTES.SIGNIN} element={<SignInPage />} />
+          <Route path={ROUTES.PASSWORD_RESET} element={<PasswordReset />} />
+        </Route>
+      </Routes> */}
+
     </>
   );
 };
