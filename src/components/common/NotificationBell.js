@@ -1,26 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Badge from "@mui/material/Badge";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import BasicMenu from "./BasicMenu";
-
-const notifications = [
-  {
-    id: 0,
-    label: "First notification",
-  },
-  {
-    id: 1,
-    label: "Second notification",
-  },
-];
-const newNotifications = `You have ${notifications.length} new notifications!`;
+import { getNotSeenNotifications } from "../../utils/firestore";
+import { notificationsData } from "../../redux/ContainersSlice";
+import { useDispatch, useSelector } from "react-redux";
 const noNotifications = "No new notifications";
-const NotificationBell = ({ iconColor }) => {
-  const [open, setOpen] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+const NotificationBell = (props) => {
+  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const dispatch = useDispatch();
+  const { notifications } = useSelector((state) => state.containers);
 
+  useEffect(() => {
+    refreshNotifications();
+  }, [props.refresh]);
+
+  const refreshNotifications = () => {
+    getNotSeenNotifications().then((results) => {
+      var notificationsArray = [];
+      results.forEach((doc) => {
+        var notif = doc.data();
+        notif.date = notif.date.toDate().toDateString();
+        notificationsArray.push(notif);
+      });
+      dispatch(notificationsData({ notifications: notificationsArray }));
+    });
+  };
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
     setOpen(true);
@@ -33,23 +41,32 @@ const NotificationBell = ({ iconColor }) => {
   return (
     <div>
       <Tooltip
-        title={notifications.length ? newNotifications : noNotifications}
+        title={
+          notifications && notifications.length
+            ? "You have notifications"
+            : noNotifications
+        }
       >
         <IconButton
-          color={iconColor}
-          onClick={notifications.length ? handleOpen : null}
+          color={props.iconColor}
+          onClick={notifications && notifications.length ? handleOpen : null}
         >
-          <Badge badgeContent={notifications.length} color="error">
+          <Badge
+            badgeContent={notifications && notifications.length}
+            color="error"
+          >
             <NotificationsIcon />
           </Badge>
         </IconButton>
       </Tooltip>
-      <BasicMenu
-        open={open}
-        anchorEl={anchorEl}
-        handleClose={handleClose}
-        menuItems={notifications}
-      />
+      {notifications && (
+        <BasicMenu
+          open={open}
+          anchorEl={anchorEl}
+          handleClose={handleClose}
+          menuItems={notifications}
+        />
+      )}
     </div>
   );
 };

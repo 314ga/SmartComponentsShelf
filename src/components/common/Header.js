@@ -1,14 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CommonButton from "./CommonButton";
 import NotificationBell from "./NotificationBell";
-import Avatar from "@mui/material/Avatar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Tooltip from "@mui/material/Tooltip";
-import HelpIcon from "@mui/icons-material/Help";
-import Box from "@mui/material/Box";
 import BasicMenu from "./BasicMenu";
-import { logOut } from "../../utils/firestore";
+import {
+  Snackbar,
+  CloseIcon,
+  IconButton,
+  Button,
+  HelpIcon,
+  Tooltip,
+  Box,
+  Typography,
+  Avatar,
+} from "../../mImportHelper/MUIImports";
+import {
+  logOut,
+  onMessageListener,
+  requestNotificationPermision,
+} from "../../utils/firestore";
+import { useDispatch } from "react-redux";
+import { notificationToken } from "../../redux/ContainersSlice";
 const setting = [
   {
     id: 0,
@@ -55,52 +66,108 @@ const headerStyles = {
 };
 const Header = ({ title }) => {
   const [open, setOpen] = useState(false);
+  const [openSnack, setOpenSnack] = useState(false);
+  const [refresh, doRefresh] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
-
+  const [isTokenFound, setTokenFound] = useState(false);
+  const [notification, setNotification] = useState({ title: "", body: "" });
+  const dispatch = useDispatch();
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
     setOpen(true);
   };
-
+  const handleCloseSnack = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnack(false);
+  };
   const handleClose = (e) => {
     if (e.target.innerText === "Log Out") {
       logOut();
     }
     setOpen(false);
   };
+  //execute just once when page loaded
+  useEffect(() => {
+    //TODO: Use line bellow when connection to DB is made
+    //fetchContainers();
+    const setClientToken = (token) => {
+      dispatch(notificationToken({ newNotificationToken: token }));
+    };
+    requestNotificationPermision(setTokenFound, setClientToken);
+
+    onMessageListener()
+      .then((payload) => {
+        setOpenSnack(true);
+        doRefresh((prev) => prev + 1);
+        setNotification({
+          title: payload.notification.title,
+          body: payload.notification.body,
+        });
+      })
+      .catch((err) => console.log("failed: ", err));
+  }, []);
 
   return (
-    <Box sx={headerStyles.wrapper}>
-      <Box sx={headerStyles.topRow}>
-        <Typography sx={headerStyles.link}>Go to docs</Typography>
-        <NotificationBell iconColor="white" />
-        <Avatar
-          src="https://mui.com/static/images/avatar/1.jpg"
-          onClick={setting.length ? handleOpen : null}
-        />
-        <BasicMenu
-          open={open}
-          anchorEl={anchorEl}
-          handleClose={handleClose}
-          menuItems={setting}
-        />
-      </Box>
-      <Box sx={headerStyles.middleRow}>
-        <Typography variant="h1" color="white">
-          {title}
-        </Typography>
-        <Box>
-          <CommonButton sx={headerStyles.webButton} variant="outlined">
-            Web setup
-          </CommonButton>
-          <Tooltip title="Help">
-            <IconButton color="white" sx={headerStyles.helpIcon}>
-              <HelpIcon />
+    <>
+      <Snackbar
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        open={openSnack}
+        autoHideDuration={6000}
+        onClose={handleCloseSnack}
+        message={notification.title}
+        action={
+          <React.Fragment>
+            <Button color="secondary" size="small" onClick={handleCloseSnack}>
+              {notification.body}
+            </Button>
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={handleCloseSnack}
+            >
+              <CloseIcon fontSize="small" />
             </IconButton>
-          </Tooltip>
+          </React.Fragment>
+        }
+      />
+      <Box sx={headerStyles.wrapper}>
+        <Box sx={headerStyles.topRow}>
+          <Typography sx={headerStyles.link} style={{ color: "white" }}>
+            Thresholds
+          </Typography>
+          <NotificationBell iconColor="white" refresh={refresh} />
+          <Avatar
+            src="https://mui.com/static/images/avatar/1.jpg"
+            onClick={setting.length ? handleOpen : null}
+          />
+          <BasicMenu
+            open={open}
+            anchorEl={anchorEl}
+            handleClose={handleClose}
+            menuItems={setting}
+          />
+        </Box>
+        <Box sx={headerStyles.middleRow}>
+          <Typography variant="h1">{title}</Typography>
+          <Box>
+            <CommonButton sx={headerStyles.webButton} variant="outlined">
+              Web setup
+            </CommonButton>
+            <Tooltip title="Help">
+              <IconButton sx={headerStyles.helpIcon}>
+                <HelpIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 
