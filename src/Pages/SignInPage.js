@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { signInWithEmailAndPswd, sendResetEmail } from "../utils/firestore";
-import { Button } from "../mImportHelper/MUIImports";
+import { Button, Grid } from "../mImportHelper/MUIImports";
 import { Box, TextField } from "../mImportHelper/MUIImports";
 const SignInPage = () => {
   const [resetClicked, setResetClicked] = useState(false);
@@ -58,45 +58,65 @@ const SignInPage = () => {
   return (
     <>
       {!resetClicked && (
-        <Box
-          component="form"
-          sx={{
-            "& .MuiTextField-root": { m: 1, width: "25ch" },
-          }}
-          noValidate
-          autoComplete="off"
+        <Grid
+          container
+          spacing={0}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          style={{ minHeight: "100vh" }}
         >
-          <div>
-            <TextField
-              error={email === ""}
-              helperText={email === "" ? "Empty field!" : " "}
-              id="email"
-              label="Email"
-              required
-              value={email}
-              onChange={onTextFieldChange}
-            />
-            <TextField
-              error={password === ""}
-              helperText={password === "" ? "Empty field!" : " "}
-              id="password"
-              label="Password"
-              required
-              value={password}
-              onChange={onTextFieldChange}
-            />
-          </div>
-          <Button disabled={loading} onClick={handleSignIn} variant="contained">
-            Log-in
-          </Button>
-          <Button
-            disabled={loading}
-            onClick={() => handleResetPassword(true)}
-            variant="outlined"
-          >
-            Reset Password
-          </Button>
-        </Box>
+          <Grid item xs={3}>
+            <Box
+              component="form"
+              sx={{
+                "& .MuiTextField-root": { m: 4, width: "25ch" },
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <Box>
+                <Box sx={{ m: 3 }}>
+                  <TextField
+                    error={email === ""}
+                    helperText={email === "" ? "Empty field!" : " "}
+                    id="email"
+                    label="Email"
+                    required
+                    value={email}
+                    onChange={onTextFieldChange}
+                  />
+                </Box>
+                <Box sx={{ m: 3 }}>
+                  <TextField
+                    error={password === ""}
+                    helperText={password === "" ? "Empty field!" : " "}
+                    id="password"
+                    label="Password"
+                    required
+                    value={password}
+                    onChange={onTextFieldChange}
+                  />
+                </Box>
+              </Box>
+
+              <Button
+                disabled={loading}
+                onClick={handleSignIn}
+                variant="contained"
+              >
+                Log-in
+              </Button>
+              <Button
+                disabled={loading}
+                onClick={() => handleResetPassword(true)}
+                variant="outlined"
+              >
+                Reset Password
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
       )}
 
       {resetClicked && (

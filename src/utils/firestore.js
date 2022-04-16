@@ -128,19 +128,25 @@ export const addNotificationToDB = async (
   }
 };
 
+//TESTED - WORKS
 export const getNotSeenNotifications = async () => {
   var notifications = collection(firestore, "Thresholds");
   const q = query(notifications, where("seen", "==", false));
   return await getDocs(q);
 };
+export const getNotifications = async () => {
+  return await getDocs(collection(firestore, "Thresholds"));
+};
+export const getSeenNotifications = async () => {
+  var notifications = collection(firestore, "Thresholds");
+  const q = query(notifications, where("seen", "==", true));
+  return await getDocs(q);
+};
 
+//TESTED - WORKS
 export const seenNotification = async (notificationID) => {
-  try {
-    const workerDocumentRef = firestore.doc(notificationID);
-    workerDocumentRef.set({ seen: true }, { merge: true });
-  } catch (error) {
-    return new Error("Error with setting notificaiton as seen"); // rejects the promise
-  }
+  var docRef = doc(firestore, "Thresholds", notificationID);
+  return updateDoc(docRef, { seen: true });
 };
 
 export const requestNotificationPermision = (setTokenFound, setUserToken) => {

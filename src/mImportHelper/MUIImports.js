@@ -30,13 +30,19 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import HelpIcon from "@mui/icons-material/Help";
 import Avatar from "@mui/material/Avatar";
+import CheckIcon from "@material-ui/icons/Check";
+import ClearIcon from "@material-ui/icons/Clear";
+import AddShoppingCartTwoToneIcon from "@mui/icons-material/AddShoppingCartTwoTone";
 export {
   Card,
+  CheckIcon,
   Avatar,
+  ClearIcon,
   Typography,
   CardActionArea,
   CardActions,
   CardContent,
+  AddShoppingCartTwoToneIcon,
   CardMedia,
   Divider,
   createStyles,

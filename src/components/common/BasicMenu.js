@@ -6,7 +6,8 @@ const BasicMenu = ({ anchorEl, handleClose, open, menuItems }) => {
     <Menu id="basic-menu" anchorEl={anchorEl} open={open} onClose={handleClose}>
       {menuItems.map((item, index) => (
         <MenuItem onClick={handleClose} key={"item-" + index}>
-          {item.componentName + " " + item.title}
+          {item.componentName && item.componentName + " " + item.title}
+          {item.label && item.label}
         </MenuItem>
       ))}
     </Menu>

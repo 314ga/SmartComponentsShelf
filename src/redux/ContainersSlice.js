@@ -6,6 +6,7 @@ const containersSlice = createSlice({
   //TODO: remove hardcoded values
   initialState: {
     notificationToken: "",
+    seenNotifications: [],
     notifications: [],
     containersData: [
       {
@@ -41,6 +42,9 @@ const containersSlice = createSlice({
     notificationsData: (state, action) => {
       state.notifications = action.payload.notifications;
     },
+    seenNotificationsAction: (state, action) => {
+      state.seenNotifications = action.payload.seenNotifications;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -61,5 +65,6 @@ const containersSlice = createSlice({
       });
   },
 });
-export const { notificationToken, notificationsData } = containersSlice.actions;
+export const { notificationToken, notificationsData, seenNotificationsAction } =
+  containersSlice.actions;
 export default containersSlice.reducer;
