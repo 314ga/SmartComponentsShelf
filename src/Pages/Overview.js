@@ -21,14 +21,10 @@ import {
   Box,
 } from "../mImportHelper/MUIImports";
 import { Divider } from "@mui/material";
+import GridWrapper from "../components/common/GridWrapper";
 
 const useStyles = makeStyles((theme) => ({
-  test: {
-    fontFamily: "Comfortaa",
-    textAlign: "center",
-    color: "#F452e5",
-    marginTop: "2vh",
-  },
+
   scale_icon: {
     width: "10em !important",
     height: "10em !important",
@@ -161,9 +157,10 @@ const Overview = () => {
     setRemainingQuantity(container[0].remainingQuantity);
     setTotalWeight(container[0].totalWeight);
   };
+
   return (
     <>
-      <Container fixed className={classes.test}>
+      <Container style={{ marginLeft: '500px' }}>
         <Grid container spacing={3}>
           {loading === false &&
             containersData &&

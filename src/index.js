@@ -13,6 +13,8 @@ import store from "./redux/configureStore";
 import { Provider } from "react-redux";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import * as ROUTES from "./components/common/RouterContstants/routes";
+import SignInPage from "./Pages/SignInPage";
+import PasswordReset from "./Pages/PasswordReset";
 
 ReactDOM.render(
   <ThemeProvider theme={dashboardTheme}>
@@ -24,6 +26,8 @@ ReactDOM.render(
             <Route path={ROUTES.REPORTS} element={<Reports />} />
             <Route path={ROUTES.OVERVIEW} element={<Overview />} />
             <Route path={ROUTES.ORDERS} element={<Orders />} />
+            <Route path={ROUTES.SIGNIN} element={<SignInPage />} />
+            <Route path={ROUTES.PASSWORD_RESET} element={<PasswordReset />} />
           </Route>
         </Routes>
       </BrowserRouter>

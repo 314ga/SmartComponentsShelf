@@ -2,12 +2,15 @@ import React, { useState, useRef } from "react";
 import { signInWithEmailAndPswd, sendResetEmail } from "../utils/firestore";
 import { Button, Grid } from "../mImportHelper/MUIImports";
 import { Box, TextField } from "../mImportHelper/MUIImports";
+import * as ROUTES from "../components/common/RouterContstants/routes";
+import { useNavigate } from "react-router-dom";
+
 const SignInPage = () => {
   const [resetClicked, setResetClicked] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
+  let navigate = useNavigate();
   async function handleSubmitReset(e) {
     try {
       setLoading(true);
@@ -23,6 +26,7 @@ const SignInPage = () => {
       setLoading(true);
       await signInWithEmailAndPswd(email, password)
         .then(function (firebaseUser) {
+          navigate(ROUTES.OVERVIEW);
           console.log(firebaseUser);
         })
         .catch(function (error) {
@@ -128,6 +132,8 @@ const SignInPage = () => {
           noValidate
           autoComplete="off"
         >
+          {" "}
+          <h1>Log in</h1>
           <div>
             <TextField
               error={email === ""}

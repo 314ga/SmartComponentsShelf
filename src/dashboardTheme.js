@@ -16,7 +16,7 @@ export const dashboardTheme = createTheme({
 					},
 					'&.MuiButton-outlined': {
 						color: "#fff",
-						borderColor: 'rgba(255, 255, 255, 0.7)',
+						borderColor: 'rgba(255, 255, 255, 0.7) !important',
 						'&:hover': {
 							backgroundColor: 'rgba(0, 0, 0, 0.04)'
 						},
@@ -31,6 +31,7 @@ export const dashboardTheme = createTheme({
 			styleOverrides: {
 				root: {
 					fontSize: '1.7rem',
+					color: 'white',
 				},
 			},
 		},
@@ -40,11 +41,12 @@ export const dashboardTheme = createTheme({
 			main: '#fff',
 		},
 	},
+
 	typography: {
 		h1: {
-			fontSize: '1.6rem',
+			fontSize: '1.6rem !important',
 			fontWeight: 600,
-			color: '#fff',
+			color: '#fff !important',
 			letterSpacing: '0.5px',
 			textTransform: 'capitalize',
 		},

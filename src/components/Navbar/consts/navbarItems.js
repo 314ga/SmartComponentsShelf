@@ -13,13 +13,13 @@ export const mainNavbarItems = [
 	},
 	{
 		id: 1,
-		icon: <Inventory2Icon />,
+		icon: <SsidChartIcon />,
 		label: 'Overview',
 		route: ROUTES.OVERVIEW,
 	},
 	{
 		id: 2,
-		icon: <SsidChartIcon />,
+		icon: <Inventory2Icon />,
 		label: 'Orders',
 		route: ROUTES.ORDERS,
 	},
