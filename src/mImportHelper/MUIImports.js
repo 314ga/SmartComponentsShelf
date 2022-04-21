@@ -34,12 +34,15 @@ import Avatar from "@mui/material/Avatar";
 import CheckIcon from "@material-ui/icons/Check";
 import ClearIcon from "@material-ui/icons/Clear";
 import AddShoppingCartTwoToneIcon from "@mui/icons-material/AddShoppingCartTwoTone";
+import Paper from '@mui/material/Paper';
+
 export {
   FormControl, useFormControl,
   Card,
   CheckIcon,
   Avatar,
   ClearIcon,
+  Paper,
   Typography,
   CardActionArea,
   CardActions,
