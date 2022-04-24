@@ -1,5 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchContainers, updateContainer } from "./ThunkAPICalls";
+import {
+  fetchContainers,
+  updateContainer,
+  fetchContainer1,
+  fetchContainer2,
+} from "./ThunkAPICalls";
 
 const containersSlice = createSlice({
   name: "containers",
@@ -8,24 +13,8 @@ const containersSlice = createSlice({
     notificationToken: "",
     seenNotifications: [],
     notifications: [],
-    containersData: [
-      {
-        containerName: "Container 1",
-        componentsName: "Resistors",
-        componentsDescription: "Resistors for smartie people",
-        singleComponentWeight: 0.24,
-        remainingQuantity: 15,
-        totalWeight: 3.6,
-      },
-      {
-        containerName: "Container 2",
-        componentsName: "Capacitors",
-        componentsDescription: "Capacitors for smartie people",
-        singleComponentWeight: 0.3,
-        remainingQuantity: 15,
-        totalWeight: 4.5,
-      },
-    ],
+    container1Data: [],
+    container2Data: [],
     loading: false,
     error: false,
   },
@@ -45,14 +34,24 @@ const containersSlice = createSlice({
     seenNotificationsAction: (state, action) => {
       state.seenNotifications = action.payload.seenNotifications;
     },
+    containersAction: (state, action) => {
+      state.containersData = action.payload.containersData;
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchContainers.fulfilled, (state, action) => {
-        state.containersData = action.payload;
+      .addCase(fetchContainer1.fulfilled, (state, action) => {
+        state.container1Data = action.payload;
         state.loading = false;
       })
-      .addCase(fetchContainers.pending, (state, action) => {
+      .addCase(fetchContainer1.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(fetchContainer2.fulfilled, (state, action) => {
+        state.container2Data = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchContainer2.pending, (state, action) => {
         state.loading = true;
       })
       .addCase(updateContainer.fulfilled, (state, action) => {
@@ -65,6 +64,10 @@ const containersSlice = createSlice({
       });
   },
 });
-export const { notificationToken, notificationsData, seenNotificationsAction } =
-  containersSlice.actions;
+export const {
+  notificationToken,
+  notificationsData,
+  seenNotificationsAction,
+  containersAction,
+} = containersSlice.actions;
 export default containersSlice.reducer;

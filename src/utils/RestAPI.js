@@ -8,6 +8,6 @@ export const MQTTapi = axios.create({
 
 export const DBapi = axios.create({
   // TODO: Change to database baseURL
-  baseURL: "http://localhost:7073/api/",
+  baseURL: "https://api.thingspeak.com/channels/1711037/fields",
   timeout: 5000,
 });

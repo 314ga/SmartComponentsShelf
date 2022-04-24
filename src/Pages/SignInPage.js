@@ -1,12 +1,18 @@
 import React, { useState, useRef } from "react";
 import { signInWithEmailAndPswd, sendResetEmail } from "../utils/firestore";
-import { Box, TextField, Button, Grid, Paper } from "../mImportHelper/MUIImports";
+import {
+  Box,
+  TextField,
+  Button,
+  Grid,
+  Paper,
+} from "../mImportHelper/MUIImports";
 import * as ROUTES from "../components/common/RouterContstants/routes";
 import { useNavigate } from "react-router-dom";
-import { styled } from '@mui/material/styles';
-import Logo from '../assets/logo_black.png'
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
+import { styled } from "@mui/material/styles";
+import Logo from "../assets/logo_black.png";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
 
 const SignInPage = () => {
   const [resetClicked, setResetClicked] = useState(false);
@@ -29,7 +35,7 @@ const SignInPage = () => {
       setLoading(true);
       await signInWithEmailAndPswd(email, password)
         .then(function (firebaseUser) {
-          navigate(ROUTES.OVERVIEW);
+          navigate(ROUTES.REPORTS);
           console.log(firebaseUser);
         })
         .catch(function (error) {
@@ -64,52 +70,59 @@ const SignInPage = () => {
   };
 
   const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#637c8a',
+    backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#637c8a",
     ...theme.typography.body2,
     padding: theme.spacing(1),
-    textAlign: 'center',
+    textAlign: "center",
     color: theme.palette.text.secondary,
   }));
   return (
     <>
-
       {!resetClicked && (
         <>
-
-
-
           <Container
 
           // style={{ minHeight: "100vh" }}
           >
-            <Grid container style={{ textAlign: "center" }} >
+            <Grid container style={{ textAlign: "center" }}>
               <Grid item xs={12}>
-                <div style={{ textAlign: "center" }}>    <h1>Sign in</h1></div>
+                <div style={{ textAlign: "center" }}>
+                  {" "}
+                  <h1>Sign in</h1>
+                </div>
               </Grid>
               <Grid item xs={12}>
-                <div style={{ textAlign: "center" }}>  <img src={Logo} alt="Logo" width="10%" height="auto"></img></div>
+                <div style={{ textAlign: "center" }}>
+                  {" "}
+                  <img src={Logo} alt="Logo" width="10%" height="auto"></img>
+                </div>
               </Grid>
               <Grid item xs={12}>
-                <div><TextField
-                  error={email === ""}
-                  id="email"
-                  label="Email"
-                  required
-                  value={email}
-                  onChange={onTextFieldChange}
-                /></div>
+                <div>
+                  <TextField
+                    error={email === ""}
+                    id="email"
+                    label="Email"
+                    required
+                    value={email}
+                    onChange={onTextFieldChange}
+                  />
+                </div>
               </Grid>
               <Grid item xs={12}>
-                <div >       <TextField
-                  error={password === ""}
-                  helperText={password === "" ? "Empty field!" : " "}
-                  id="password"
-                  label="Password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={onTextFieldChange}
-                /></div>
+                <div>
+                  {" "}
+                  <TextField
+                    error={password === ""}
+                    helperText={password === "" ? "Empty field!" : " "}
+                    id="password"
+                    label="Password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={onTextFieldChange}
+                  />
+                </div>
               </Grid>
               <Grid item xs={6} style={{ textAlign: "right" }}>
                 <div>
@@ -117,40 +130,45 @@ const SignInPage = () => {
                     disabled={loading}
                     onClick={() => handleResetPassword(true)}
                     variant="outlined"
-                    color="secondary" >
+                    color="secondary"
+                  >
                     Reset Password
-                  </Button></div>
+                  </Button>
+                </div>
               </Grid>
               <Grid item xs={6} style={{ textAlign: "left" }}>
-                <div> <Button
-                  disabled={loading}
-                  onClick={handleSignIn}
-                  variant="contained"
-                  color="primary"
-                >
-                  Log-in
-                </Button></div>
-              </Grid></Grid>
+                <div>
+                  {" "}
+                  <Button
+                    disabled={loading}
+                    onClick={handleSignIn}
+                    variant="contained"
+                    color="primary"
+                  >
+                    Log-in
+                  </Button>
+                </div>
+              </Grid>
+            </Grid>
           </Container>
-
         </>
       )}
 
       {resetClicked && (
-        <Grid container
+        <Grid
+          container
           spacing={0}
           p
           direction="column"
           alignItems="center"
           justifyContent="center"
-          style={{ minHeight: "100vh" }}>
+          style={{ minHeight: "100vh" }}
+        >
           <Box
             component="form"
             sx={{
-              '& .MuiTextField-root': { m: 1, width: '25ch' },
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
             }}
-
-
           >
             {" "}
             <h1>Reset Password</h1>
@@ -164,17 +182,13 @@ const SignInPage = () => {
                 required
                 value={email}
                 onChange={onTextFieldChange}
-
-
               />
             </Box>
-
-            <Box >
+            <Box>
               <Button
                 disabled={loading}
                 onClick={handleSubmitReset}
                 variant="outlined"
-
               >
                 Reset Password
               </Button>
@@ -182,12 +196,12 @@ const SignInPage = () => {
                 disabled={loading}
                 onClick={() => handleResetPassword(false)}
                 variant="contained"
-
               >
                 Go to sign in
               </Button>
             </Box>
-          </Box></Grid>
+          </Box>
+        </Grid>
       )}
     </>
   );

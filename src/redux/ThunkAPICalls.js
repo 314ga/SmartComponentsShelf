@@ -5,11 +5,18 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
     2. /update-container/{container-ID} ------ PUT method to change specific container 
 */
 //getting all information about all containers from DB
-export const fetchContainers = createAsyncThunk(
-  "containers/fetchContainers",
+export const fetchContainer1 = createAsyncThunk(
+  "containers/fetchContainer1",
   async (props, thunkAPI) => {
-    const response = await DBapi.get("get-containers/");
-    return response.data;
+    const response = await DBapi.get("/1.json?api_key=YFAYYK824V7A7DEA");
+    return response.data.feeds;
+  }
+);
+export const fetchContainer2 = createAsyncThunk(
+  "containers/fetchContainer2",
+  async (props, thunkAPI) => {
+    const response = await DBapi.get("/2.json?api_key=YFAYYK824V7A7DEA");
+    return response.data.feeds;
   }
 );
 //updating settings of chosen container in DB

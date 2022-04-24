@@ -137,6 +137,9 @@ export const getNotSeenNotifications = async () => {
 export const getNotifications = async () => {
   return await getDocs(collection(firestore, "Thresholds"));
 };
+export const getContainers = async () => {
+  return await getDocs(collection(firestore, "ContainerWeight"));
+};
 export const getSeenNotifications = async () => {
   var notifications = collection(firestore, "Thresholds");
   const q = query(notifications, where("seen", "==", true));
@@ -147,6 +150,16 @@ export const getSeenNotifications = async () => {
 export const seenNotification = async (notificationID) => {
   var docRef = doc(firestore, "Thresholds", notificationID);
   return updateDoc(docRef, { seen: true });
+};
+export const updateContainer = async (containerName, container) => {
+  var docRef = doc(firestore, "ContainerWeight", containerName);
+  return updateDoc(docRef, {
+    description: container.description,
+    name: container.name,
+    singleCompWeight: container.singleCompWeight,
+    storedComponents: container.storedComponents,
+    threshold: container.threshold,
+  });
 };
 
 export const requestNotificationPermision = (setTokenFound, setUserToken) => {

@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from "react";
-import { fetchContainers, updateContainer } from "../redux/ThunkAPICalls";
 import { useSelector, useDispatch } from "react-redux";
 import "@fontsource/comfortaa";
 import clsx from "clsx";
@@ -19,16 +18,20 @@ import {
   DialogActions,
   TextField,
   Box,
+  Alert,
+  Stack,
+  Collapse,
 } from "../mImportHelper/MUIImports";
 import { Divider } from "@mui/material";
 import GridWrapper from "../components/common/GridWrapper";
+import { getContainers, updateContainer } from "../utils/firestore";
+import { containersAction } from "../redux/ContainersSlice";
 
 const useStyles = makeStyles((theme) => ({
-
   scale_icon: {
     width: "10em !important",
     height: "10em !important",
-    color: "#F452e5",
+    color: "black !important",
   },
   buttonProgress: {
     color: "#fb4577",
@@ -43,17 +46,17 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
   },
 }));
-const Overview = () => {
+
+const Overview = (props) => {
   const classes = useStyles();
   const [containerName, setContainerName] = useState("");
   const [componentsName, setComponentsName] = useState("");
   const [componentsDescription, setComponentsDescription] = useState("");
   const [singleComponentWeight, setSingleComponentWeight] = useState("");
-  const [remainingQuantity, setRemainingQuantity] = useState("");
-  const [totalWeight, setTotalWeight] = useState("");
+  const [threshold, setThreshold] = useState("");
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [clickedContainer, setClickedContainer] = useState("");
   const [infoLoading, setInfoLoading] = useState(false);
   const [containerLoading, setContainerLoading] = useState(false);
@@ -73,30 +76,45 @@ const Overview = () => {
 
   //execute just once when page loaded
   useEffect(() => {
-    //TODO: Use line bellow when connection to DB is made
-    //fetchContainers();
+    getAllContainers();
   }, []);
+
+  const getAllContainers = () => {
+    getContainers().then((results) => {
+      var containersArray = [];
+      results.forEach((doc) => {
+        var cont = doc.data();
+        containersArray.push(cont);
+      });
+      dispatch(containersAction({ containersData: containersArray }));
+    });
+  };
 
   //handle container update after changes are confirmed
   function handleContainerUpdate() {
     setSuccess(false);
     setContainerLoading(true);
 
-    //bootstrap alerts
-    setError("");
-    setMessage("");
-    updateContainer(clickedContainer)
-      .then((container) => {
+    var container = {
+      description: componentsDescription,
+      name: containerName,
+      singleCompWeight: singleComponentWeight,
+      storedComponents: componentsName,
+      threshold: threshold,
+    };
+    updateContainer(clickedContainer.replace(/\s/g, ""), container)
+      .then((response) => {
         setMessage("Container Successfully updated");
+        props.updateContainer(clickedContainer.replace(/\s/g, ""));
+        getAllContainers();
         setContainerLoading(false);
         setSuccess(true);
       })
       .catch((e) => {
-        console.log(e);
-        setError("Failed to update container");
+        setMessage(e);
+        setError(true);
       });
   }
-
   // what happens when "Edit settings" button is pressed
   const handleEditBtnClick = (e) => {
     getSelectedContainer(e.currentTarget.id);
@@ -123,20 +141,15 @@ const Overview = () => {
         setComponentsDescription(e.target.value);
         break;
       }
-      case "totalWeight": {
-        var m = e.target.value.match(/^\d{0,5}(\.\d{0,3}){0,1}$/);
-        if (m) setTotalWeight(e.target.value);
-        break;
-      }
       case "singleComponentWeight": {
         var m = e.target.value.match(/^\d{0,5}(\.\d{0,3}){0,1}$/);
         if (m) setSingleComponentWeight(e.target.value);
 
         break;
       }
-      case "remainingQuantity": {
+      case "threshold": {
         var m = e.target.value.match(/^\d{0,10}$/);
-        if (m) setRemainingQuantity(e.target.value);
+        if (m) setThreshold(e.target.value);
 
         break;
       }
@@ -148,19 +161,18 @@ const Overview = () => {
   //get selected container properties and set them to states
   const getSelectedContainer = (ID) => {
     const container = containersData.filter((container) => {
-      return container.containerName.localeCompare(ID);
+      if (container.name.localeCompare(ID) == 0) return container;
     });
-    setContainerName(container[0].containerName);
-    setComponentsName(container[0].componentsName);
-    setComponentsDescription(container[0].componentsDescription);
-    setSingleComponentWeight(container[0].singleComponentWeight);
-    setRemainingQuantity(container[0].remainingQuantity);
-    setTotalWeight(container[0].totalWeight);
+    setContainerName(container[0].name);
+    setComponentsName(container[0].storedComponents);
+    setComponentsDescription(container[0].description);
+    setSingleComponentWeight(container[0].singleCompWeight);
+    setThreshold(container[0].threshold);
   };
 
   return (
     <>
-      <Container style={{ marginLeft: '500px' }}>
+      <Container style={{ marginLeft: "auto", marginRight: "auto" }}>
         <Grid container spacing={3}>
           {loading === false &&
             containersData &&
@@ -171,26 +183,26 @@ const Overview = () => {
                   xs={12}
                   sm={12}
                   md={6}
-                  lg={4}
-                  key={container.containerName + "-g"}
+                  lg={6}
+                  key={container.name + "-g"}
                 >
                   <Card>
                     <CardActionArea>
-                      {<ScaleIcon className={classes.scale_icon} />}
+                      <ScaleIcon className={classes.scale_icon} />
                       <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
-                          {container.containerName}
+                          {container.name}
                         </Typography>
                         <Typography variant="body2">
-                          Currently, component {container.componentsName} is
-                          stored in the {container.containerName}. Weight of the
-                          single component is {container.singleComponentWeight}.
+                          Currently, component {container.storedComponents} is
+                          stored in the {container.name}. Weight of the single
+                          component is {container.singleCompWeight}g.
                         </Typography>
                       </CardContent>
                     </CardActionArea>
                     <CardActions>
                       <Button
-                        id={container.containerName}
+                        id={container.name}
                         variant="contained"
                         color="secondary"
                         onClick={handleDetailsBtnClick}
@@ -198,7 +210,7 @@ const Overview = () => {
                         Details
                       </Button>
                       <Button
-                        id={container.containerName}
+                        id={container.name}
                         variant="contained"
                         color="primary"
                         onClick={handleEditBtnClick}
@@ -235,18 +247,13 @@ const Overview = () => {
         </p>
         <Divider />
         <p>
-          <b>Signle component weight: </b>
+          <b>Single component weight(g): </b>
           {singleComponentWeight}
         </p>
         <Divider />
         <p>
-          <b>Remaining quantity: </b>
-          {remainingQuantity}
-        </p>
-        <Divider />
-        <p>
-          <b>Total weight: </b>
-          {totalWeight}
+          <b>Threshold(Component pieces): </b>
+          {threshold}
         </p>
         <DialogActions>
           <Button onClick={() => setOpenPicPopup(false)} color="secondary">
@@ -315,28 +322,34 @@ const Overview = () => {
           </div>
           <div>
             <TextField
-              error={remainingQuantity === ""}
-              helperText={remainingQuantity === "" ? "Empty field!" : " "}
-              id="remainingQuantity"
-              label="Ramaining quantity"
+              error={threshold === ""}
+              helperText={threshold === "" ? "Empty field!" : " "}
+              id="threshold"
+              label="Threshold"
               required
-              value={remainingQuantity}
-              onChange={onTextFieldChange}
-            />
-            <TextField
-              error={totalWeight === ""}
-              helperText={totalWeight === "" ? "Empty field!" : " "}
-              id="totalWeight"
-              label="Total weight"
-              required
-              value={totalWeight}
+              value={threshold}
               onChange={onTextFieldChange}
             />
           </div>
+          <Stack sx={{ width: "100%" }} spacing={2}>
+            <Collapse in={error}>
+              <Alert severity="error">{message}</Alert>
+            </Collapse>
+            <Collapse in={success}>
+              <Alert severity="success">{message}</Alert>
+            </Collapse>
+          </Stack>
         </Box>
 
         <DialogActions>
-          <Button onClick={() => setOpenEditPopup(false)} color="secondary">
+          <Button
+            onClick={() => {
+              setOpenEditPopup(false);
+              setError(false);
+              setSuccess(false);
+            }}
+            color="secondary"
+          >
             Close
           </Button>
           <div className={classes.wrapper}>

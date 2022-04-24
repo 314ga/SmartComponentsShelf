@@ -4,7 +4,6 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import Components from "./Pages/Components";
-import Overview from "./Pages/Overview";
 import Orders from "./Pages/Orders";
 import Reports from "./Pages/Reports";
 import { ThemeProvider } from "@mui/material/styles";
@@ -14,7 +13,6 @@ import { Provider } from "react-redux";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import * as ROUTES from "./components/common/RouterContstants/routes";
 import SignInPage from "./Pages/SignInPage";
-import PasswordReset from "./Pages/PasswordReset";
 
 ReactDOM.render(
   <ThemeProvider theme={dashboardTheme}>
@@ -22,12 +20,10 @@ ReactDOM.render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<App />}>
-            <Route path={ROUTES.COMPONENTS} element={<Components />} />
+            <Route path={ROUTES.ORDERS} element={<Components />} />
             <Route path={ROUTES.REPORTS} element={<Reports />} />
-            <Route path={ROUTES.OVERVIEW} element={<Overview />} />
-            <Route path={ROUTES.ORDERS} element={<Orders />} />
+            <Route path={ROUTES.THRESHOLDS} element={<Orders />} />
             <Route path={ROUTES.SIGNIN} element={<SignInPage />} />
-            <Route path={ROUTES.PASSWORD_RESET} element={<PasswordReset />} />
           </Route>
         </Routes>
       </BrowserRouter>
