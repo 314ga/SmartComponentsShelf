@@ -72,6 +72,17 @@ const Reports = () => {
   //TESTED WORKS
   //to test you can publish field1 in the topic with executing this URL in browser: https://api.thingspeak.com/update?api_key=19ZTPNAJN1N3C377&field1=15
   //TOPIC format: channels/1711037/subscribe/fields/field1  [field1-4] 1-scale1 2-scale2 3-threshold1 4-threshold2
+  const DataFormater = (number) => {
+    if (number > 1000000000) {
+      return (number / 1000000000).toString() + "B";
+    } else if (number > 1000000) {
+      return (number / 1000000).toString() + "M";
+    } else if (number > 1000) {
+      return (number / 1000).toString() + "K";
+    } else {
+      return number.toString();
+    }
+  };
   const mqttSub = (topic, dotID) => {
     if (client) {
       client.subscribe(topic, (error) => {
@@ -362,12 +373,21 @@ const Reports = () => {
                 <LineChart
                   width={500}
                   height={300}
-                  data={containersValues[Object.keys(containersValues)[index]]}
+                  data={
+                    containersValues[Object.keys(containersValues)[index]]
+                      .field1
+                      ? containersValues[
+                          Object.keys(containersValues)[index]
+                        ].map((d) => ({ ...d, field1: +d.field1 }))
+                      : containersValues[
+                          Object.keys(containersValues)[index]
+                        ].map((d) => ({ ...d, field2: +d.field2 }))
+                  }
                   margin={{
-                    top: 5,
+                    top: 0,
                     right: 30,
                     left: 20,
-                    bottom: 5,
+                    bottom: 0,
                   }}
                 >
                   <tbody>
