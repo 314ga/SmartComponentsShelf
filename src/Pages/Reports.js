@@ -40,7 +40,7 @@ const data = [
   },
 ];
 
-const client = mqtt.connect("ws://mqtt3.thingspeak.com:443/mqtt", {
+const client = mqtt.connect("tcp://mqtt3.thingspeak.com:443/mqtt", {
   clientId: "Jw8NLC4eITEJGws9OxglGBg",
   protocolId: "MQTT",
   keepAlive: 30,
@@ -61,7 +61,10 @@ const Reports = () => {
   const [subscribed, setSubscribed] = useState([]);
   const [container1, setContainer1] = useState([]);
   const [container2, setContainer2] = useState([]);
-  const [containersValues, setContainersValues] = useState([]);
+  const [containersValues, setContainersValues] = useState({
+    container1: [],
+    container2: [],
+  });
   const [clientConnected, setClientConnected] = useState(false);
   const { containersData, loading, container1Data, container2Data } =
     useSelector((state) => state.containers);
@@ -139,14 +142,15 @@ const Reports = () => {
       //setSubscribed(newArray);
 
       if (buf != undefined) {
-        setContainersValues([]);
+        setContainersValues({ container1: [], container2: [] });
+        console.log(rawTopic);
         if (rawTopic === "channels/1711037/subscribe/fields/field1") {
           getContainerData(
-            "https://api.thingspeak.com/channels/1711037/fields/1.json?api_key=YFAYYK824V7A7DEA"
+            "https://api.thingspeak.com/channels/1711037/feeds.json?api_key=YFAYYK824V7A7DEA"
           );
         } else
           getContainerData(
-            "https://api.thingspeak.com/channels/1711037/fields/2.json?api_key=YFAYYK824V7A7DEA"
+            "https://api.thingspeak.com/channels/1711037/feeds.json?api_key=YFAYYK824V7A7DEA"
           );
       }
     });
@@ -158,10 +162,7 @@ const Reports = () => {
     dispatch(fetchContainer1()).then(() => {});
     dispatch(fetchContainer2()).then(() => {});
     getContainerData(
-      "https://api.thingspeak.com/channels/1711037/fields/1.json?api_key=YFAYYK824V7A7DEA"
-    );
-    getContainerData(
-      "https://api.thingspeak.com/channels/1711037/fields/2.json?api_key=YFAYYK824V7A7DEA"
+      "https://api.thingspeak.com/channels/1711037/feeds.json?api_key=YFAYYK824V7A7DEA"
     );
     /*return function cleanup() {
       mqttDisconnect();
@@ -185,10 +186,20 @@ const Reports = () => {
     axios
       .get(container)
       .then(function (response) {
-        setContainersValues((currentArray) => [
-          ...currentArray,
-          response.data.feeds,
-        ]);
+        console.log(response);
+        let data = response.data.feeds;
+        let container1 = [];
+        let container2 = [];
+        data.forEach((data, index) => {
+          if (data.field1) {
+            container1.push(data);
+          } else if (data.field2) {
+            container2.push(data);
+          }
+        });
+        console.log(container1);
+        console.log(container2);
+        setContainersValues({ container1, container2 });
       })
       .catch(function (error) {
         // handle error
@@ -206,11 +217,12 @@ const Reports = () => {
       "channels/1711037/subscribe/fields/field" +
       (parseInt(e.currentTarget.id) + 1);
 
-    console.log(url);
     mqttSub(url, e.currentTarget.id);
   };
   const checkState = (e) => {
-    //switch (e.currentTarget.id) {
+    console.log(containersValues[Object.keys(containersValues)[0]]);
+    console.log(containersValues[Object.keys(containersValues)[1]]);
+    console.log(containersValues);
   };
 
   const handleUnsubscribe = (e) => {
@@ -223,11 +235,25 @@ const Reports = () => {
 
     mqttUnSub(url, e.currentTarget.id);
   };
-  const updateContainer = () => {
-    mqttPublish("channels/1711037/publish/fields/field3", 3);
+  const updateContainer = (container) => {
+    switch (container) {
+      case "Container1": {
+        mqttPublish("channels/1711037/publish/fields/field3", 1);
+        break;
+      }
+      case "Container2": {
+        mqttPublish("channels/1711037/publish/fields/field4", 2);
+        break;
+      }
+      default:
+        break;
+    }
   };
   return (
     <Container style={{ marginLeft: "auto", marginRight: "auto" }}>
+      {/*} <Button variant="contained" color="secondary" onClick={checkState}>
+        test
+      </Button>*/}
       <Grid container spacing={3}>
         {loading === false &&
           containersData &&
@@ -336,7 +362,7 @@ const Reports = () => {
                 <LineChart
                   width={500}
                   height={300}
-                  data={containersValues[index]}
+                  data={containersValues[Object.keys(containersValues)[index]]}
                   margin={{
                     top: 5,
                     right: 30,
@@ -344,7 +370,9 @@ const Reports = () => {
                     bottom: 5,
                   }}
                 >
-                  <tbody>{containersValues[index]}</tbody>
+                  <tbody>
+                    {containersValues[Object.keys(containersValues)[index]]}
+                  </tbody>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="created_at" />
                   <YAxis />
